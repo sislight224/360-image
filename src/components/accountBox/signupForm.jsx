@@ -89,6 +89,7 @@ export function SignupForm(props) {
           Signin
         </BoldLink>
       </LineText>
+      <ToastContainer />
     </BoxContainer>
   );
 }

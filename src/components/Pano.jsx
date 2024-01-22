@@ -105,11 +105,46 @@ const Pano = () => {
         }
         const pArray = [...posArray];
 
-        geometry = new THREE.BufferGeometry().setFromPoints(pArray);
+        geometry = new THREE.BufferGeometry();
+        // geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+        geometry.setFromPoints(pArray)
         // lines
-        var matLines = new THREE.LineBasicMaterial({color: "blue"});
-        lines = new THREE.LineLoop(geometry, matLines);
+        var matLines = new THREE.LineBasicMaterial({color: "blue", linewidth: 10});
+        lines = new THREE.Line(geometry, matLines);
         viewer.add(lines);
+
+
+        // Create an array of positions for the vertices
+        const positions = [
+          0, 0, 0,   // Vertex 1
+          1, 1, 1,   // Vertex 2
+          2, 2, 2    // Vertex 3
+        ];
+
+        // Create an array of colors for the vertices
+        const colors = [
+          1, 0, 0,   // Color for Vertex 1 (red)
+          0, 1, 0,   // Color for Vertex 2 (green)
+          0, 0, 1    // Color for Vertex 3 (blue)
+        ];
+
+        // Create a LineGeometry
+        const geometry1 = new THREE.LineGeometry();
+
+        // Set the positions and colors of the vertices
+        geometry1.setPositions(positions);
+        geometry1.setColors(colors);
+        // Create a LineMaterial
+        const material = new THREE.LineMaterial({
+          linewidth: 5, // Set the desired line width here
+          color: 0xff0000, // Set the line color
+        });
+
+        // Create a Line2 object using the geometry and material
+        const line = new THREE.Line2(geometry1, material);
+
+        viewer.add(line);
+
 
       }
 
