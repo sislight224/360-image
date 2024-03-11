@@ -70,9 +70,13 @@ const Pano = () => {
 
   const pano = useRef(null);
   const upload = (file) => {
-    console.log(file.name)
+    console.log(URL.createObjectURL(file))
 
-    initPano(file.name);
+    if (file) {
+      // blah.src = URL.createObjectURL(file)
+    }
+
+    initPano(URL.createObjectURL(file));
 
     setIsNew(false);
   }
@@ -114,36 +118,36 @@ const Pano = () => {
         viewer.add(lines);
 
 
-        // Create an array of positions for the vertices
-        const positions = [
-          0, 0, 0,   // Vertex 1
-          1, 1, 1,   // Vertex 2
-          2, 2, 2    // Vertex 3
-        ];
+        // // Create an array of positions for the vertices
+        // const positions = [
+        //   0, 0, 0,   // Vertex 1
+        //   1, 1, 1,   // Vertex 2
+        //   2, 2, 2    // Vertex 3
+        // ];
 
-        // Create an array of colors for the vertices
-        const colors = [
-          1, 0, 0,   // Color for Vertex 1 (red)
-          0, 1, 0,   // Color for Vertex 2 (green)
-          0, 0, 1    // Color for Vertex 3 (blue)
-        ];
+        // // Create an array of colors for the vertices
+        // const colors = [
+        //   1, 0, 0,   // Color for Vertex 1 (red)
+        //   0, 1, 0,   // Color for Vertex 2 (green)
+        //   0, 0, 1    // Color for Vertex 3 (blue)
+        // ];
 
-        // Create a LineGeometry
-        const geometry1 = new THREE.LineGeometry();
+        // // Create a LineGeometry
+        // const geometry1 = new THREE.LineGeometry();
 
-        // Set the positions and colors of the vertices
-        geometry1.setPositions(positions);
-        geometry1.setColors(colors);
-        // Create a LineMaterial
-        const material = new THREE.LineMaterial({
-          linewidth: 5, // Set the desired line width here
-          color: 0xff0000, // Set the line color
-        });
+        // // Set the positions and colors of the vertices
+        // geometry1.setPositions(positions);
+        // geometry1.setColors(colors);
+        // // Create a LineMaterial
+        // const material = new THREE.LineMaterial({
+        //   linewidth: 5, // Set the desired line width here
+        //   color: 0xff0000, // Set the line color
+        // });
 
-        // Create a Line2 object using the geometry and material
-        const line = new THREE.Line2(geometry1, material);
+        // // Create a Line2 object using the geometry and material
+        // const line = new THREE.Line2(geometry1, material);
 
-        viewer.add(line);
+        // viewer.add(line);
 
 
       }
@@ -354,12 +358,33 @@ const Pano = () => {
     ChangeListData()
     
 
-    panorama = new PANOLENS.ImagePanorama(`assets/${url}`);
+    panorama = new PANOLENS.ImagePanorama(`${url}`);
+
+    const infospot = new PANOLENS.Infospot( 350, "https://images-na.ssl-images-amazon.com/images/I/61mtx+420hL._AC_US436_QL65_.jpg" );
+    infospot.position.set( 0, 0, -1000 );
+    infospot.addHoverText( 'Hello Panolens', 30 );
+    panorama.add( infospot );
+
+    const onClick = () => {
+        const intersects = viewer.raycaster.intersectObject( panorama, true );
+        if ( intersects.length > 0 ) {
+            const point = intersects[ 0 ].point.clone();
+            const world = panorama.getWorldPosition( new THREE.Vector3() );
+            point.sub( world );
+            const infospot = new PANOLENS.Infospot( 350, PANOLENS.DataImage.Info );
+            infospot.position.copy( point );
+            infospot.show();
+            console.log(infospot.position)
+            panorama.add( infospot );
+        }
+    };
+
 
     panorama.addEventListener("click", function(e){
       if (e.intersects.length > 0) return;
       const a = viewer.raycaster.intersectObject(viewer.panorama, true)[0].point;
 
+      onClick();
       drawText(a);
       drawPolygon(a);
       drawLine(a);
@@ -528,11 +553,11 @@ const Pano = () => {
             pen_size_1
           </span>
         </div>
-        <div className={`btn btn-${status.CIRCLE?'success' : 'info'}`} onClick={onCircle.bind(this)}>
+        {/* <div className={`btn btn-${status.CIRCLE?'success' : 'info'}`} onClick={onCircle.bind(this)}>
           <span className="material-symbols-outlined">
             circle
           </span>
-        </div>
+        </div> */}
         <div className={`btn btn-${status.TEXT?'success' : 'info'}`} onClick={onText.bind(this)}>
           <span className="material-symbols-outlined">
             text_increase
@@ -545,15 +570,14 @@ const Pano = () => {
       </div>
 
       <div className='coucou' ref={pano} id="coucou">
-          {/* {isNew && <div className="coucou-new">
+          {isNew && <div className="coucou-new">
             <UploadFiles uploadFile={upload} />
-          </div>} */}
-          {isNew && <ImageSelect onSelectImage={onSelectImage}/>}
+          </div>}
+          {/* {isNew && <ImageSelect onSelectImage={onSelectImage}/>} */}
       </div>
 
       <div data-spy="scroll" className='control-list'>
         <div className="list-group">
-
           {listData.map((list, i) => 
             <a key={i} href="#" className="list-group-item list-group-item-action flex-column align-items-start">
               <div className="d-flex w-100 justify-content-between">
